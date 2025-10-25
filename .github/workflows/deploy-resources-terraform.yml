@@ -1,4 +1,4 @@
-name:"Terraform Workflow"
+name: "Terraform Workflow"
 
 on:
     workflow_call:
@@ -15,7 +15,7 @@ on:
         aws-lock-dynamodb-table:
           required: true
           type: string
-          aws-region: 
+        aws-region: 
             required: true
             type: string            
 jobs:
@@ -49,7 +49,8 @@ jobs:
 
             - name: Plan Terraform Changes
               id: terraform-plan
-              run: cd infra && terraform plan -var="AWS_REGION=sa-east-1"
+              run: cd infra && terraform workspace select ${{ inputs.environment }} || terraform workspace new ${{ inputs.environment }} && terraform plan -var-file="./envs/${{ inputs.environment }}/terraform.tfvars" -out="${{inputs.environment}}.plan"
 
             - name: Apply Terraform Configuration
-              run: terraform apply -var="AWS_REGION=sa-east-1" -var="environment=${{ inputs.environment }}" -auto-approve
+              id: terraform-apply
+              run: cd infra && terraform workspace select ${{ inputs.environment }}|| terraform workspace new ${{ inputs.environment }} && terraform apply "${{inputs.environment}}.plan"
