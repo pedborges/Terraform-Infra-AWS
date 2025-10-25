@@ -12,7 +12,7 @@ jobs:
   terraform:
         uses: ./.github/workflows/deploy-resources-terraform.yml
         with:
-          environment: "development"
+          environment: development
           aws-assume-role-arn: "arn:aws:iam::795772440200:role/TerraformDeployRole" #it can be used a secret here for better security
           aws-statefile-s3-bucket: "pedborges-sa-east-1-terraform-statefile" #it can be used a secret here for better security
           aws-lock-dynamodb-table: "pedborges-sa-east-1-terraform-lock" #it can be used a secret here for better security ex ."${ { secrets.AWS_LOCK_DYNAMODB_TABLE } }"
