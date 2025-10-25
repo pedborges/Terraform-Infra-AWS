@@ -1,1 +1,1 @@
- bucket_name ="dev-sa-east-1-MyDemoProject-Environment-pipeline"
+ bucket_name ="dev-sa-east-1-mydemoproject-environment-pipeline"
