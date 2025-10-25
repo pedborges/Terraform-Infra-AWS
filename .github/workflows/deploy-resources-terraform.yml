@@ -42,7 +42,7 @@ jobs:
            
 
             - name: Initialize Terraform
-              run: cd Infra && terraform init -backend-config="bucket=${{ inputs.aws-statefile-s3-bucket }}" -backend-config="dynamodb_table=${{ inputs.aws-lock-dynamodb-table }}" -backend-config="key${{github.event.repository.name}}" -backend-config="region=${{ inputs.aws-region }}"
+              run: cd Infra && terraform init -backend-config="bucket=${{ inputs.aws-statefile-s3-bucket }}" -backend-config="dynamodb_table=${{ inputs.aws-lock-dynamodb-table }}" -backend-config="key=${{github.event.repository.name}}" -backend-config="region=${{ inputs.aws-region }}"
 
             - name: Validate Terraform Configuration
               run:  terraform validate
