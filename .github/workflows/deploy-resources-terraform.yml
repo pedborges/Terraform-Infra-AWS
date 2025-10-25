@@ -49,7 +49,7 @@ jobs:
 
             - name: Plan Terraform Changes
               id: terraform-plan
-              run: cd Infra && terraform workspace select ${{ inputs.environment }} || terraform workspace new ${{ inputs.environment }} && terraform plan -var-file="envs/${{inputs.environment}}/terraform.tfvars" -out="${{inputs.environment}}.plan"
+              run: cd Infra && terraform workspace select ${{ inputs.environment }} || terraform workspace new ${{ inputs.environment }} && terraform plan -var-file="envs/${{inputs.environment}}/terraform.tfvars" -lock-timeout=60s -out="${{inputs.environment}}.plan"
 
             - name: Apply Terraform Configuration
               id: terraform-apply
