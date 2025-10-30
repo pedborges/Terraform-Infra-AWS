@@ -45,7 +45,7 @@ resource "aws_apprunner_service" "myDemoProject_AppRunnerService" {
         port = "8000"
       }
       image_identifier      = "795772440200.dkr.ecr.sa-east-1.amazonaws.com/demo_project_repository:latest"
-      image_repository_type = "ECR_Private"
+      image_repository_type = "ECR"
     }
     auto_deployments_enabled = true
       authentication_configuration {
