@@ -36,25 +36,3 @@ resource "aws_iam_role_policy_attachment" "ecr_access" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
 }
 
-resource "aws_apprunner_service" "myDemoProject_AppRunnerService" {
-  service_name = var.app_runner_service_name
-
-  source_configuration {
-    image_repository {
-      image_configuration {
-        port = "8000"
-      }
-      image_identifier      = "795772440200.dkr.ecr.us-east-1.amazonaws.com/demo_project_repository:latest"
-      image_repository_type = "ECR"
-    }
-    auto_deployments_enabled = true
-      authentication_configuration {
-    access_role_arn = aws_iam_role.apprunner_ecr_role.arn
-  }
-  }
-
-  tags = {
-        ManagedBy  = "Terraform"
-        Environment = "dev"
-  }
-}
