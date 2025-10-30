@@ -1,5 +1,5 @@
 provider "aws" {
-  region = "sa-east-1"
+  region = "us-east-1"
 }
 
 resource "aws_ecr_repository" "webapi" {
@@ -44,7 +44,7 @@ resource "aws_apprunner_service" "myDemoProject_AppRunnerService" {
       image_configuration {
         port = "8000"
       }
-      image_identifier      = "795772440200.dkr.ecr.sa-east-1.amazonaws.com/demo_project_repository:latest"
+      image_identifier      = "795772440200.dkr.ecr.us-east-1.amazonaws.com/demo_project_repository:latest"
       image_repository_type = "ECR"
     }
     auto_deployments_enabled = true
