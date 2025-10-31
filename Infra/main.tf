@@ -7,34 +7,7 @@ data "aws_iam_role" "apprunner_ecr_role" {
 resource "aws_ecr_repository" "webapi" {
   name = "demo_project_repository"
 }
-resource "aws_apprunner_service" "my_demo_project_service" {
-  service_name = var.app_runner_service_name
 
-  source_configuration {
-    authentication_configuration {
-      access_role_arn = data.aws_iam_role.apprunner_ecr_role.arn
-    }
-
-    image_repository {
-      image_identifier      = "795772440200.dkr.ecr.us-east-1.amazonaws.com/demo_project_repository:latest"
-      image_repository_type = "ECR"
-      image_configuration {
-        port = "80"
-      }
-    }
-
-    auto_deployments_enabled = true
-  }
-
-  instance_configuration {
-    cpu    = "1024" # 1 vCPU
-    memory = "2048" # 2 GB
-  }
-
-  tags = {
-    ManagedBy = "Terraform"
-  }
-}
 # this define that any App Runner service can assume this role
 data "aws_iam_policy_document" "assume_role_policy" {
   statement {
