@@ -43,7 +43,18 @@ jobs:
 
             - name: Initialize Terraform
               run: cd Infra && terraform init -backend-config="bucket=${{ inputs.aws-statefile-s3-bucket }}" -backend-config="dynamodb_table=${{inputs.aws-lock-dynamodb-table}}" -backend-config="key=${{github.event.repository.name}}" -backend-config="region=${{inputs.aws-region}}"
+            - name: (Optional) Import existing IAM role
+              run: |
+                cd Infra
+                ROLE_NAME="AppRunnerECRAccess"
+                ROLE_EXISTS=$(aws iam get-role --role-name $ROLE_NAME 2>/dev/null || true)
 
+                if [ -n "$ROLE_EXISTS" ]; then
+                     echo "ℹ️ Role $ROLE_NAME already exists, importing..."
+                     ] terraform import aws_iam_role.apprunner_ecr_role $ROLE_NAME || true
+                else
+                   echo "✅ Role $ROLE_NAME does not exist yet. Nothing to import."
+                fi
             - name: Validate Terraform Configuration
               run:  terraform validate
 
