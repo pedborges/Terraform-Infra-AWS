@@ -1,16 +1,18 @@
 provider "aws" {
   region = "us-east-1"
 }
-
+data "aws_iam_role" "apprunner_ecr_role" {
+  name = "AppRunnerECRAccess"
+}
 resource "aws_ecr_repository" "webapi" {
   name = "demo_project_repository"
 }
 resource "aws_apprunner_service" "my_demo_project_service" {
-  service_name = dev.app_runner_service_name
+  service_name = var.app_runner_service_name
 
   source_configuration {
     authentication_configuration {
-      access_role_arn = aws_iam_role.apprunner_ecr_role.arn
+      access_role_arn = data.aws_iam_role.apprunner_ecr_role.arn
     }
 
     image_repository {
