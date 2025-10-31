@@ -34,7 +34,7 @@ jobs:
                     terraform_version: 1.8.3
 
             - name: Configure AWS Credentials
-              uses: aws-actions/configure-aws-credentials@v2 #config creds aws.
+              uses: aws-actions/configure-aws-credentials@v2 #config creds aws..
               with:
                   role-to-assume: ${{ inputs.aws-assume-role-arn }}
                   aws-region: ${{ inputs.aws-region }}
