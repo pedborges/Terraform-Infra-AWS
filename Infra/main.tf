@@ -20,6 +20,14 @@ resource "aws_apprunner_service" "my_demo_project_service" {
       image_repository_type = "ECR"
       image_configuration {
         port = "80"
+        runtime_environment_variables = {
+             "Jwt__Key"      = "your_super_secret_jwt_key_change_me"
+             "Jwt__Issuer"   = "MYDemoProjectURL"
+             "Jwt__Audience" = "your-audience"
+             "ASPNETCORE_ENVIRONMENT" = "Production"
+             "TokenData__SecretAPIKey"= "default_secret_key_please_change_it"
+             "ConnectionStrings__DefaultConnection" = "Server=YOUR_SERVER_NAME;Database=YourDatabaseName;User Id=YOUR_USER;Password=YOUR_PASSWORD;TrustServerCertificate=True;"
+        }
       }
     }
  
