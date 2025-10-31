@@ -22,9 +22,18 @@ resource "aws_apprunner_service" "my_demo_project_service" {
         port = "80"
       }
     }
-
+ 
     auto_deployments_enabled = true
   }
+  health_check_configuration {
+      protocol             = "HTTP"
+      path                 = "/"
+      healthy_threshold    = 1
+      unhealthy_threshold  = 5
+      interval             = 10
+      timeout              = 5
+    }
+
 
   instance_configuration {
     cpu    = "1024" # 1 vCPU
