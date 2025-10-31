@@ -14,6 +14,6 @@ jobs:
         with:
           environment: production
           aws-assume-role-arn: "arn:aws:iam::795772440200:role/TerraformDeployRole" #it can be used a secret here for better security.
-          aws-statefile-s3-bucket: "pedborges-us-east-1-terraform-statefile" #it can be used a secret here for better security
+          aws-statefile-s3-bucket: "pedborges-us-east-1-terraform-statefile" #it can be used a secret here for better security.
           aws-lock-dynamodb-table: "pedborges-us-east-1-terraform-lock" #it can be used a secret here for better security ex ."${ { secrets.AWS_LOCK_DYNAMODB_TABLE } }"
           aws-region: "us-east-1"
