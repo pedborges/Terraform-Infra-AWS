@@ -27,7 +27,7 @@ resource "aws_apprunner_service" "my_demo_project_service" {
   }
   health_check_configuration {
       protocol             = "HTTP"
-      path                 = "/"
+      path                 = "/health"
       healthy_threshold    = 1
       unhealthy_threshold  = 5
       interval             = 10
@@ -51,7 +51,7 @@ data "aws_iam_policy_document" "assume_role_policy" {
 
     principals {
       type        = "Service"
-      identifiers = ["build.apprunner.amazonaws.com"] #if you are an app runner service you can use this service principal
+      identifiers = ["build.apprunner.amazonaws.com"] #if you are an app runner service you can use this service principal.
     }
 
     actions = ["sts:AssumeRole"]
