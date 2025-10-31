@@ -21,15 +21,15 @@ data "aws_iam_policy_document" "assume_role_policy" {
 }
 # Create the IAM role and the assume_role_policy defines which kind of service can assume this role
 #this is like a costume that App Runner will wear to be able to access ECR
-resource "aws_iam_role" "apprunner_ecr_role" {
-  name               = "AppRunnerECRAccess"
-  assume_role_policy = data.aws_iam_policy_document.assume_role_policy.json
+# resource "aws_iam_role" "apprunner_ecr_role" {
+#  name               = "AppRunnerECRAccess"
+#  assume_role_policy = data.aws_iam_policy_document.assume_role_policy.json
 
-  tags = {
-    Name       = "AppRunnerECRAccess"
-    ManagedBy  = "Terraform"
-  }
-}
+#   tags = {
+#      Name       = "AppRunnerECRAccess"
+#      ManagedBy  = "Terraform"
+#     }
+#}
 
 resource "aws_iam_role_policy_attachment" "ecr_access" {
   role       = aws_iam_role.apprunner_ecr_role.name
