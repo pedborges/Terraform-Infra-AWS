@@ -31,8 +31,8 @@ data "aws_iam_policy_document" "assume_role_policy" {
 #     }
 #}
 
-resource "aws_iam_role_policy_attachment" "ecr_access" {
-  role       = aws_iam_role.apprunner_ecr_role.name
-  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
-}
+# resource "aws_iam_role_policy_attachment" "ecr_access" {
+#  role       = aws_iam_role.apprunner_ecr_role.name
+#  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
+#}
 
