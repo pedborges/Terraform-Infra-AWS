@@ -124,7 +124,7 @@ resource "aws_ecs_service" "myapi_service" {
 #this is like a costume that App Runner will wear to be able to access ECR
 # resource "aws_iam_role" "apprunner_ecr_role" {
 #  name               = "AppRunnerECRAccess"
-#  assume_role_policy = data.aws_iam_policy_document.assume_role_policy.json
+#  assume_role_policy = data.aws_iam_policy_document.assume_role_policy.json.
 
 #   tags = {
 #      Name       = "AppRunnerECRAccess"
