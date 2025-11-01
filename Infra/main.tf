@@ -8,6 +8,7 @@ resource "aws_ecr_repository" "webapi" {
 
 
 
+
 # Create the IAM role and the assume_role_policy defines which kind of service can assume this role
 #this is like a costume that App Runner will wear to be able to access ECR
 # resource "aws_iam_role" "apprunner_ecr_role" {
