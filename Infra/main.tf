@@ -25,7 +25,7 @@ resource "aws_apprunner_service" "my_demo_project_service" {
              "Jwt__Issuer"   = "MYDemoProjectURL"
              "Jwt__Audience" = "your-audience"
              "ASPNETCORE_ENVIRONMENT" = "Production"
-             "ASPNETCORE_HTTP_PORTS" = "80"
+             "ASPNETCORE_HTTP_PORTS" = "8080"
              "TokenData__SecretAPIKey"= "default_secret_key_please_change_it"
              "ConnectionStrings__DefaultConnection" = "Server=YOUR_SERVER_NAME;Database=YourDatabaseName;User Id=YOUR_USER;Password=YOUR_PASSWORD;TrustServerCertificate=True;"
         }
