@@ -45,7 +45,7 @@ resource "aws_apprunner_service" "my_demo_project_service" {
 
 
   instance_configuration {
-    cpu    = "1024" # 1 vCPU
+    cpu    = "1024" # 1 vCPU.
     memory = "2048" # 2 GB
   }
 
