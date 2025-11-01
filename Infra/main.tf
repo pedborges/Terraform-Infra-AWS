@@ -35,7 +35,7 @@ resource "aws_lightsail_container_service_deployment_version" "myapi_deployment"
     health_check {
       healthy_threshold   = 2
       unhealthy_threshold = 5
-      timeout_seconds     = 5
+      timeout_seconds     = 10
       interval_seconds    = 10
       path                = "/health"
       success_codes       = "200-499"
