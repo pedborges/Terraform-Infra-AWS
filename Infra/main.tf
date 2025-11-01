@@ -91,7 +91,7 @@ resource "aws_ecs_task_definition" "myapi_task" {
   container_definitions = jsonencode([
     {
       name      = "myapi",
-      image     = "795772440200.dkr.ecr.us-east-1.amazonaws.com/demo_project_repository:latest",
+      image     = "720283940682.dkr.ecr.us-east-2.amazonaws.com/demo_project_repository:latest",
       essential = true,
       portMappings = [{ containerPort = 8080, protocol = "tcp" }],
       environment = [
