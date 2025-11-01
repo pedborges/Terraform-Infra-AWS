@@ -53,7 +53,7 @@ resource "aws_apprunner_service" "my_demo_project_service" {
     ManagedBy = "Terraform"
   }
 }
-# this define that any App Runner service can assume this role
+# this define that any App Runner service can assume this role.
 data "aws_iam_policy_document" "assume_role_policy" {
   statement {
     effect = "Allow"
@@ -83,3 +83,6 @@ data "aws_iam_policy_document" "assume_role_policy" {
 #  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
 #}
 
+output "apprunner_service_url" {
+  value = aws_apprunner_service.api.service_url
+}
