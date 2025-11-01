@@ -19,7 +19,7 @@ resource "aws_apprunner_service" "my_demo_project_service" {
       image_identifier      = "795772440200.dkr.ecr.us-east-1.amazonaws.com/demo_project_repository:latest"
       image_repository_type = "ECR"
       image_configuration {
-        port = "80"
+        port = "8080"
         runtime_environment_variables = {
              "Jwt__Key"      = "your_super_secret_jwt_key_change_me"
              "Jwt__Issuer"   = "MYDemoProjectURL"
