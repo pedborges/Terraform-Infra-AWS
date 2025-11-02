@@ -15,3 +15,7 @@ variable "image_tag" {
     type = string
   default = "latest"
 }
+variable "ecs_public_endpoint" {
+  type        = string
+  default = "Public endpoint (IP or DNS) of ECS Fargate API"
+}
