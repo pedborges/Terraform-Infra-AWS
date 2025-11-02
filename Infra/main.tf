@@ -58,7 +58,7 @@ resource "aws_lb" "api-application-load-balancer" {
 }
 
 resource "aws_lb_listener" "http_listener" {
-  load_balancer_arn = aws_lb.api_application_load_balancer.arn
+  load_balancer_arn = aws_lb.api-application-load-balancer.arn
   port              = 80
   protocol          = "HTTP"
 
@@ -72,7 +72,7 @@ resource "aws_lb_listener" "http_listener" {
   }
 }
 resource "aws_lb_listener" "https_listener" {
-  load_balancer_arn = aws_lb.api_application_load_balancer.arn
+  load_balancer_arn = aws_lb.api-application-load-balancer.arn
   port              = 443
   protocol          = "HTTPS"
   ssl_policy        = "ELBSecurityPolicy-2016-08"
@@ -80,7 +80,7 @@ resource "aws_lb_listener" "https_listener" {
 
   default_action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.api_group_MyDemoProject.arn
+    target_group_arn = aws_lb_target_group.api-group-MyDemoProject.arn
   }
 }
 resource "aws_lb_target_group" "api-group-MyDemoProject" {
