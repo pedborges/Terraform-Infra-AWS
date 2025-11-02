@@ -48,7 +48,6 @@ resource "aws_apprunner_service" "this" {
     }
   }
 
-  auto_scaling_configuration_arn = aws_apprunner_auto_scaling_configuration.this.arn
   tags = {
   Project = "MyDemoProject"
   Environment = "Production"
@@ -100,15 +99,6 @@ resource "aws_iam_role_policy" "apprunner_ecr_policy" {
   })
 }
 
-# ------------------------------------------------------------------------------
-# AUTO SCALING CONFIGURATION
-# ------------------------------------------------------------------------------
-resource "aws_apprunner_auto_scaling_configuration" "this" {
-  auto_scaling_configuration_name = "${var.service_name}-scaling"
-  max_concurrency                 = 50
-  max_size                        = 1
-  min_size                        = 1
-}
 
 # ------------------------------------------------------------------------------
 # CUSTOM DOMAIN WITH ACM CERTIFICATE
