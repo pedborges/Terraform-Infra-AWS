@@ -1,221 +1,117 @@
-#1️⃣ Client sends request: 
- #   https://myapi-alb-123.elb.amazonaws.com/health 
-
-#2️⃣ ALB receives it on port 443. 
-#   ↓ 
-#  (Handled by HTTPS listener) 
-
-#3️⃣ Listener says: 
-#    “Forward this request to target group api_tg” 
-#   ↓ 
-#4️⃣ Target group has: 
-#   IPs of your ECS tasks (e.g. 10.0.1.45:8080, 10.0.1.46:8080) 
-#   ↓ 
-#5️⃣ ALB picks a healthy task and forwards the request.
-
 provider "aws" {
   region = "us-east-1"
 }
 
+
 resource "aws_ecr_repository" "webapi" {
   name = "demo_project_repository"
 }
-# --- Networking --------------------------------------------------
-resource "aws_vpc" "main" {
-  cidr_block = "10.0.0.0/16" //network range 10.0.0.0 – 10.0.255.255
-}
 
-resource "aws_subnet" "public_a" {
-  vpc_id                  = aws_vpc.main.id //connect subnet to VPC
-  cidr_block              = "10.0.1.0/24" //defines range of IPs in subnet (256 IPs)
-  availability_zone       = "us-east-1a"
-  map_public_ip_on_launch = true
-  tags = {
-    Name = "terraform-subnet"     
-  }
-}
+resource "aws_apprunner_service" "this" {
+  service_name = var.service_name
 
-resource "aws_internet_gateway" "gw" {
-  vpc_id = aws_vpc.main.id //internet provider (ex: home router to access internet)
-  tags = {
-    Name = "terraform-gateway"     
-  }
-}
+  source_configuration {
+    image_repository {
+      image_identifier      = "${aws_ecr_repository.webapi.repository_url}:${var.image_tag}"
+      image_repository_type = "ECR"
 
-resource "aws_route_table" "public" {
-  vpc_id = aws_vpc.main.id //belongs to the same VPC
+      image_configuration {
+        port = "8080"
+        runtime_environment_variables = {
+          ASPNETCORE_ENVIRONMENT = "Production"
+        }
+      }
+    }
 
-  route {
-    cidr_block = "0.0.0.0/0" //route to all IPs on the internet
-    gateway_id = aws_internet_gateway.gw.id //through the internet gateway
-  }
-   tags = {
-    Name = "terraform-route-table"     
-  }
-}
-
-resource "aws_route_table_association" "a" {
-  subnet_id      = aws_subnet.public_a.id //binding the subnet that i defined above with the route table the i defined above
-  route_table_id = aws_route_table.public.id //binding the subnet that i defined above with the route table the i defined above
-}
-# --- Load Balancer -----------------------------------
-resource "aws_lb" "api-application-load-balancer" {
-  name               = "api-application-load-balancer"
-  load_balancer_type = "application"
-  subnets            = [aws_subnet.public_a.id]
-  security_groups    = [aws_security_group.alb_sg.id]
-}
-
-resource "aws_lb_listener" "http_listener" {
-  load_balancer_arn = aws_lb.api-application-load-balancer.arn
-  port              = 80
-  protocol          = "HTTP"
-
-  default_action {
-    type = "redirect" #redirect HTTP to HTTPS
-    redirect {
-      port        = "443"
-      protocol    = "HTTPS"
-      status_code = "HTTP_301"
+    authentication_configuration {
+      access_role_arn = aws_iam_role.apprunner_ecr_role.arn
     }
   }
-}
-resource "aws_lb_listener" "https_listener" {
-  load_balancer_arn = aws_lb.api-application-load-balancer.arn
-  port              = 443
-  protocol          = "HTTPS"
-  ssl_policy        = "ELBSecurityPolicy-2016-08"
-  certificate_arn   = "arn:aws:acm:us-east-1:795772440200:certificate/e3dbe5a8-1cfb-4281-96bc-48dba3f0008d"
 
-  default_action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.api-group-MyDemoProject.arn
+  network_configuration {
+    egress_configuration {
+      egress_type = "DEFAULT"
+    }
+
+    ingress_configuration {
+      is_publicly_accessible = true
+    }
   }
-}
-resource "aws_lb_target_group" "api-group-MyDemoProject" {
-  name        = "api-group-MyDemoProject"
-  port        = 8080
-  protocol    = "HTTP"
-  vpc_id      = aws_vpc.main.id
-  target_type = "ip"
 
-  health_check {
-    path                = "/health" 
-    interval            = 30
-    timeout             = 5
-    healthy_threshold   = 2
-    unhealthy_threshold = 2
-  }
-}
-# --- ECS Cluster -------------------------------------------------
-resource "aws_ecs_cluster" "api_cluster" {
-  name = "myapi-cluster" //a group of ECS services and tasks
+  auto_scaling_configuration_arn = aws_apprunner_auto_scaling_configuration.this.arn
+  tags = {
+  Project = "MyDemoProject"
+  Environment = "Production"
+ } 
 }
 
-# --- IAM Role for Task Execution (to pull from ECR) --------------
-resource "aws_iam_role" "ecs_task_exec_role" {
-  name = "ecsTaskExecutionRole"
-  assume_role_policy = jsonencode({ //defining who can assume this role
+resource "aws_iam_role" "apprunner_ecr_role" {
+  name = "AppRunnerECRAccess"
+
+  assume_role_policy = jsonencode({
     Version = "2012-10-17",
-    Statement = [{
-      Effect = "Allow",
-      Principal = { Service = "ecs-tasks.amazonaws.com" },
-      Action = "sts:AssumeRole"
-    }]
+    Statement = [
+      {
+        Effect = "Allow",
+        Principal = {
+          Service = [
+           "build.apprunner.amazonaws.com",
+           "tasks.apprunner.amazonaws.com"
+          ]
+        },
+        Action = "sts:AssumeRole"
+      }
+    ]
+  })
+  tags = {
+  Project = "MyDemoProject"
+  Environment = "Production"
+}
+}
+
+resource "aws_iam_role_policy" "apprunner_ecr_policy" {
+  name = "AppRunnerECRPolicy"
+  role = aws_iam_role.apprunner_ecr_role.id
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Action = [
+          "ecr:GetAuthorizationToken",
+          "ecr:BatchCheckLayerAvailability",
+          "ecr:GetDownloadUrlForLayer",
+          "ecr:BatchGetImage"
+        ],
+        Resource = "*"
+      }
+    ]
   })
 }
 
-resource "aws_iam_role_policy_attachment" "ecs_task_exec_attach" {
-  role       = aws_iam_role.ecs_task_exec_role.name //binding the role defined above with the policy defined below
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
-}
-resource "aws_security_group" "alb_sg" {
-  name   = "alb-sg"
-  vpc_id = aws_vpc.main.id
-
-  # Allow inbound HTTPS and HTTP
-  ingress {
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-  ingress {
-    from_port   = 443 //adding ssl port
-    to_port     = 443
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  # Allow all outbound
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
+# ------------------------------------------------------------------------------
+# AUTO SCALING CONFIGURATION
+# ------------------------------------------------------------------------------
+resource "aws_apprunner_auto_scaling_configuration" "this" {
+  auto_scaling_configuration_name = "${var.service_name}-scaling"
+  max_concurrency                 = 50
+  max_size                        = 1
+  min_size                        = 1
 }
 
-
-# --- Security Group ---------------------------------------------
-#Without load balancer.
-#resource "aws_security_group" "ecs_sg" {
-#  vpc_id = aws_vpc.main.id  //VERY IMPORTANT: Define the firewall to allow traffic in and out of the container
-#  ingress {
-#    from_port   = 8080
-#    to_port     = 8080
-#    protocol    = "tcp"
-#    cidr_blocks = ["0.0.0.0/0"]
-#  }
-#  egress {
-#    from_port   = 0
-#    to_port     = 0
-#    protocol    = "-1"
-#    cidr_blocks = ["0.0.0.0/0"]
-#  }
-#}
-
-# --- Task Definition --------------------------------------------
-resource "aws_ecs_task_definition" "myapi_task" {
-  family                   = "myapi-task"
-  requires_compatibilities  = ["FARGATE"]
-  network_mode              = "awsvpc" //each task gets its own network interface and IP.
-  cpu                       = "256"   # 0.25 vCPU
-  memory                    = "512"   # 0.5 GB
-  execution_role_arn        = aws_iam_role.ecs_task_exec_role.arn
-  runtime_platform {
-    operating_system_family = "LINUX"
-    cpu_architecture        = "X86_64"
-  }
-
-  container_definitions = jsonencode([
-    {
-      name      = "myapi",
-      image     = "795772440200.dkr.ecr.us-east-1.amazonaws.com/demo_project_repository",
-      essential = true,
-      portMappings = [{ containerPort = 8080, protocol = "tcp" }],
-      environment = [
-        { name = "ASPNETCORE_ENVIRONMENT", value = "Production" }
-      ]
-    }
-  ])
+# ------------------------------------------------------------------------------
+# CUSTOM DOMAIN WITH ACM CERTIFICATE
+# ------------------------------------------------------------------------------
+resource "aws_apprunner_custom_domain_association" "this" {
+  service_arn = aws_apprunner_service.this.arn
+  domain_name = "api.dinherama.com"
+  depends_on = [aws_apprunner_service.this]
 }
 
-# --- ECS Service -------------------------------------------------
-resource "aws_ecs_service" "myapi_service" {
-  name            = "myapi-service"
-  cluster         = aws_ecs_cluster.api_cluster.id
-  task_definition = aws_ecs_task_definition.myapi_task.arn
-  desired_count   = 1
-  launch_type     = "FARGATE"
-
-  network_configuration {
-    subnets         = [aws_subnet.public_a.id]
-    security_groups = [aws_security_group.alb_sg.id]
-    assign_public_ip = true
-  }
-
-  depends_on = [aws_iam_role_policy_attachment.ecs_task_exec_attach]
+# ------------------------------------------------------------------------------
+# OUTPUTS
+# ------------------------------------------------------------------------------
+output "apprunner_service_url" {
+  value = aws_apprunner_service.this.service_url
 }
-
-
