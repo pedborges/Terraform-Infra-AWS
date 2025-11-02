@@ -50,8 +50,8 @@ resource "aws_route_table_association" "a" {
   route_table_id = aws_route_table.public.id //binding the subnet that i defined above with the route table the i defined above
 }
 # --- Load Balancer -----------------------------------
-resource "aws_lb" "api_application_load_balancer" {
-  name               = "api_application_load_balancer"
+resource "aws_lb" "api-application-load-balancer" {
+  name               = "api-application-load-balancer"
   load_balancer_type = "application"
   subnets            = [aws_subnet.public_a.id]
   security_groups    = [aws_security_group.alb_sg.id]
@@ -83,8 +83,8 @@ resource "aws_lb_listener" "https_listener" {
     target_group_arn = aws_lb_target_group.api_group_MyDemoProject.arn
   }
 }
-resource "aws_lb_target_group" "api_group_MyDemoProject" {
-  name        = "api_group_MyDemoProject"
+resource "aws_lb_target_group" "api-group-MyDemoProject" {
+  name        = "api-group-MyDemoProject"
   port        = 8080
   protocol    = "HTTP"
   vpc_id      = aws_vpc.main.id
@@ -202,7 +202,7 @@ resource "aws_ecs_service" "myapi_service" {
 
   network_configuration {
     subnets         = [aws_subnet.public_a.id]
-    security_groups = [aws_security_group.ecs_sg.id]
+    security_groups = [aws_security_group.alb_sg.id]
     assign_public_ip = true
   }
 
