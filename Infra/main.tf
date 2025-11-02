@@ -32,12 +32,19 @@ resource "aws_apprunner_service" "this" {
         }
       }
     }
-
+     
     authentication_configuration {
       access_role_arn = aws_iam_role.apprunner_ecr_role.arn
     }
   }
-
+  health_check_configuration {
+  healthy_threshold   = 1
+  unhealthy_threshold = 10
+  interval            = 10
+  timeout             = 5
+  protocol            = "HTTP"
+  path                = "/health"
+}
   network_configuration {
     egress_configuration {
       egress_type = "DEFAULT"
