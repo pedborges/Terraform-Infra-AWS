@@ -112,7 +112,7 @@ resource "aws_iam_role_policy" "apprunner_ecr_policy" {
 
 
 # ------------------------------------------------------------------------------
-# CUSTOM DOMAIN WITH ACM CERTIFICATE.
+# CUSTOM DOMAIN WITH ACM CERTIFICATE
 # ------------------------------------------------------------------------------
 resource "aws_apprunner_custom_domain_association" "this" {
   service_arn = aws_apprunner_service.this.arn
