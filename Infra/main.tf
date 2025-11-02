@@ -14,7 +14,7 @@
 #5️⃣ ALB picks a healthy task and forwards the request.
 
 provider "aws" {
-  region = "us-east-2"
+  region = "us-east-1"
 }
 
 resource "aws_ecr_repository" "webapi" {
@@ -28,12 +28,18 @@ resource "aws_vpc" "main" {
 resource "aws_subnet" "public_a" {
   vpc_id                  = aws_vpc.main.id //connect subnet to VPC
   cidr_block              = "10.0.1.0/24" //defines range of IPs in subnet (256 IPs)
-  availability_zone       = "us-east-2a"
+  availability_zone       = "us-east-1a"
   map_public_ip_on_launch = true
+  tags = {
+    Name = "terraform-subnet"     
+  }
 }
 
 resource "aws_internet_gateway" "gw" {
   vpc_id = aws_vpc.main.id //internet provider (ex: home router to access internet)
+  tags = {
+    Name = "terraform-gateway"     
+  }
 }
 
 resource "aws_route_table" "public" {
@@ -42,6 +48,9 @@ resource "aws_route_table" "public" {
   route {
     cidr_block = "0.0.0.0/0" //route to all IPs on the internet
     gateway_id = aws_internet_gateway.gw.id //through the internet gateway
+  }
+   tags = {
+    Name = "terraform-route-table"     
   }
 }
 
@@ -76,7 +85,7 @@ resource "aws_lb_listener" "https_listener" {
   port              = 443
   protocol          = "HTTPS"
   ssl_policy        = "ELBSecurityPolicy-2016-08"
-  certificate_arn   = "arn:aws:acm:us-east-2:720283940682:certificate/fd7a3fa6-f202-41f6-8fb6-7e9399776280"
+  certificate_arn   = "arn:aws:acm:us-east-1:795772440200:certificate/e3dbe5a8-1cfb-4281-96bc-48dba3f0008d"
 
   default_action {
     type             = "forward"
@@ -182,7 +191,7 @@ resource "aws_ecs_task_definition" "myapi_task" {
   container_definitions = jsonencode([
     {
       name      = "myapi",
-      image     = "720283940682.dkr.ecr.us-east-2.amazonaws.com/demo_project_repository:latest",
+      image     = "795772440200.dkr.ecr.us-east-1.amazonaws.com/demo_project_repository",
       essential = true,
       portMappings = [{ containerPort = 8080, protocol = "tcp" }],
       environment = [
