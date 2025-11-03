@@ -1,11 +1,7 @@
 variable "app_runner_service_name" {
   type = string
+   default = "mydemoproject-app"
 }
-variable "service_name" {
-  type = string
-  default = "mydemoproject-app"
-}
-
 variable "repository_name" {
     type = string
   default = "demo_project_repository"

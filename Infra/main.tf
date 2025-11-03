@@ -14,11 +14,11 @@ provider "aws" {
 
 
 resource "aws_ecr_repository" "webapi" {
-  name = "demo_project_repository"
+  name = var.repository_name
 }
 
 resource "aws_apprunner_service" "this" {
-  service_name = var.service_name
+  service_name = var.app_runner_service_name
 
   source_configuration {
     image_repository {
@@ -32,23 +32,23 @@ resource "aws_apprunner_service" "this" {
         }
       }
     }
-     
+
     authentication_configuration {
       access_role_arn = aws_iam_role.apprunner_ecr_role.arn
     }
   }
-   instance_configuration {
+  instance_configuration {
     cpu    = "1 vCPU"
     memory = "2048"
   }
   health_check_configuration {
-  healthy_threshold   = 1
-  unhealthy_threshold = 10
-  interval            = 10
-  timeout             = 5
-  protocol            = "HTTP"
-  path                = "/health"
-}
+    healthy_threshold   = 1
+    unhealthy_threshold = 10
+    interval            = 10
+    timeout             = 5
+    protocol            = "HTTP"
+    path                = "/health"
+  }
   network_configuration {
     egress_configuration {
       egress_type = "DEFAULT"
@@ -60,9 +60,9 @@ resource "aws_apprunner_service" "this" {
   }
 
   tags = {
-  Project = "MyDemoProject"
-  Environment = "Production"
- } 
+    Project     = "MyDemoProject"
+    Environment = "Production"
+  }
 }
 
 resource "aws_iam_role" "apprunner_ecr_role" {
@@ -75,8 +75,8 @@ resource "aws_iam_role" "apprunner_ecr_role" {
         Effect = "Allow",
         Principal = {
           Service = [
-           "build.apprunner.amazonaws.com",
-           "tasks.apprunner.amazonaws.com"
+            "build.apprunner.amazonaws.com",
+            "tasks.apprunner.amazonaws.com"
           ]
         },
         Action = "sts:AssumeRole"
@@ -84,9 +84,9 @@ resource "aws_iam_role" "apprunner_ecr_role" {
     ]
   })
   tags = {
-  Project = "MyDemoProject"
-  Environment = "Production"
-}
+    Project     = "MyDemoProject"
+    Environment = "Production"
+  }
 }
 
 resource "aws_iam_role_policy" "apprunner_ecr_policy" {
@@ -96,6 +96,7 @@ resource "aws_iam_role_policy" "apprunner_ecr_policy" {
   policy = jsonencode({
     Version = "2012-10-17",
     Statement = [
+      # ECR Permissions
       {
         Effect = "Allow",
         Action = [
@@ -103,6 +104,19 @@ resource "aws_iam_role_policy" "apprunner_ecr_policy" {
           "ecr:BatchCheckLayerAvailability",
           "ecr:GetDownloadUrlForLayer",
           "ecr:BatchGetImage"
+        ],
+        Resource = "*"
+      },
+
+      # CloudWatch Logs Permissions
+      {
+        Effect = "Allow",
+        Action = [
+          "logs:CreateLogGroup",
+          "logs:CreateLogStream",
+          "logs:PutLogEvents",
+          "logs:DescribeLogGroups",
+          "logs:DescribeLogStreams"
         ],
         Resource = "*"
       }
