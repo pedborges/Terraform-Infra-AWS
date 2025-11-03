@@ -58,6 +58,9 @@ resource "aws_apprunner_service" "this" {
       is_publicly_accessible = true
     }
   }
+    observability_configuration {
+    observability_enabled = true
+  }
 
   tags = {
     Project     = "MyDemoProject"
