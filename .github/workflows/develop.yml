@@ -13,7 +13,7 @@ jobs:
         uses: ./.github/workflows/deploy-resources-terraform.yml
         with:
           environment: development
-          aws-assume-role-arn: "arn:aws:iam::720283940682:role/GitHub_Action_Permissions" #it can be used a secret here for better teste security.
+          aws-assume-role-arn: "arn:aws:iam::720283940682:role/GitHub_Action_Permissions" #it can be used a secret here for better teste security..
           aws-statefile-s3-bucket: "pedborges-us-east-1-terraform-statefile2" #it can be fused a secret here for better security.
           aws-lock-dynamodb-table: "pedborges-us-east-1-terraform-lock" #it can be used a secret here for better security ex ."${ { secrets.AWS_LOCK_DYNAMODB_TABLE } }."
           aws-region: "us-east-2"
